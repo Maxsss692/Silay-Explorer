@@ -7,435 +7,446 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <style>
-        :root {
-            --primary-green: #2F5245; /* Dark Green */
-            --secondary-green: #5C8C7A;
-            --light-bg: #F4F6F5;
-            --text-dark: #1A1A1A;
-            --white: #FFFFFF;
-            --gray: #888888;
-        }
+<style>
+/* --- 1. LOAD THE CUSTOM FONT --- */
+@font-face {
+    font-family: 'Barabara';
+    /* REMOVE 'fonts/' if the file is in the same folder as the HTML */
+    src: url('Barabara-final.woff') format('woff'); 
+    font-weight: normal;
+    font-style: normal;
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-        }
+    :root {
+        --primary-green: #2F5245; /* Dark Green */
+        --secondary-green: #5C8C7A;
+        --light-bg: #F4F6F5;
+        --text-dark: #1A1A1A;
+        --white: #FFFFFF;
+        --gray: #888888;
+    }
 
-        body {
-            background-color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+    }
 
-        /* Mobile Container */
-        .app-container {
-            width: 100%;
-            max-width: 414px; /* Phone width */
-            height: 100vh;
-            max-height: 896px;
-            background-color: var(--light-bg);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
+    body {
+        background-color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-        /* Screen Management */
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            display: none; /* Hidden by default */
-            background: var(--light-bg);
-            padding-bottom: 20px;
-        }
+    /* Mobile Container */
+    .app-container {
+        width: 100%;
+        max-width: 414px; /* Phone width */
+        height: 100vh;
+        max-height: 896px;
+        background-color: var(--light-bg);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
 
-        .screen.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
+    /* Screen Management */
+    .screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        display: none; /* Hidden by default */
+        background: var(--light-bg);
+        padding-bottom: 20px;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    .screen.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in-out;
+    }
 
-        /* --- SCREEN 1: LANDING --- */
-        #landing-screen {
-            /* FIXED: Replaced the <img...> tag with valid CSS background-image */
-            background-image: url(landing\ screen1.jpg);
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            text-align: center;
-            padding: 60px 20px;
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 
-        }
+    /* --- SCREEN 1: LANDING --- */
+    #landing-screen {
+        background-image: url('landing screen1.jpg'); /* Ensure quotes are used */
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        text-align: center;
+        padding: 60px 20px;
+    }
 
-            .landing-content h1 {
-            /* UPDATED FONT: Bebas Neue */
-            font-family: 'Bebas Neue', sans-serif;
-            color: white;
-            font-size: 3.5rem; /* Increased size slightly for Bebas */
-            letter-spacing: 2px;
-            line-height: 1;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
+.landing-content h1 {
+    font-family: 'Barabara', sans-serif;
+    text-transform: uppercase;
+    color: white;
+    
+    /* --- CHANGES START HERE --- */
+    font-size: 2rem;      /* Reduced from 3.5rem to fit the screen */
+    white-space: nowrap;    /* Forces the text to stay on 1 line */
+    letter-spacing: 1px;    /* Reduced slightly from 2px to save space */
+    /* --- CHANGES END HERE --- */
 
-        .landing-content p {
-            /* UPDATED FONT: Montserrat */
-            font-family: 'Montserrat', sans-serif;
-            color: #f0f0f0;
-            font-size: 1rem;
-            margin-bottom: 40px;
-        }
+    line-height: 1;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
 
-        .btn-primary {
-            background-color: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 16px 50px;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
-        }
+    .landing-content p {
+        font-family: 'Montserrat', sans-serif;
+        color: #f0f0f0;
+        font-size: 1rem;
+        margin-bottom: 40px;
+    }
 
-        .btn-primary:active { transform: scale(0.98); }
+    .btn-primary {
+        background-color: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 16px 50px;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transition: transform 0.1s;
+    }
 
-        /* --- SCREEN 2: HOME --- */
-        .home-header {
-            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1518182170546-0766be6f5a56?q=80&w=1000') center/cover;
-            height: 250px;
-            padding: 20px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            position: relative;
-        }
+    .btn-primary:active { transform: scale(0.98); }
 
-        .top-nav {
-            position: absolute;
-            top: 40px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            color: white;
-            font-size: 1.2rem;
-            z-index: 10;
-        }
+    /* --- SCREEN 2: HOME --- */
+    .home-header {
+        background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1518182170546-0766be6f5a56?q=80&w=1000') center/cover;
+        height: 250px;
+        padding: 20px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        position: relative;
+    }
 
-        .search-bar {
-            background: white;
-            border-radius: 25px;
-            padding: 12px 20px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            color: var(--gray);
-            font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+    .top-nav {
+        position: absolute;
+        top: 40px;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        color: white;
+        font-size: 1.2rem;
+        z-index: 10;
+    }
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 20px;
-        }
+    .search-bar {
+        background: white;
+        border-radius: 25px;
+        padding: 12px 20px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        color: var(--gray);
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
-        .menu-btn {
-            background: white;
-            border: 1px solid #eee;
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+    .menu-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        padding: 20px;
+    }
 
-        .menu-btn:active { background-color: #f0f0f0; }
+    .menu-btn {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
 
-        .menu-btn i {
-            font-size: 1.4rem;
-            color: var(--primary-green);
-        }
+    .menu-btn:active { background-color: #f0f0f0; }
 
-        .menu-btn h4 { font-size: 0.9rem; color: var(--text-dark); margin-bottom: 2px; }
-        .menu-btn p { font-size: 0.7rem; color: var(--gray); }
+    .menu-btn i {
+        font-size: 1.4rem;
+        color: var(--primary-green);
+    }
 
-        .section-title {
-            padding: 0 20px;
-            font-size: 1.2rem;
-            color: var(--primary-green);
-            font-weight: 700;
-            margin-top: 10px;
-        }
+    .menu-btn h4 { font-size: 0.9rem; color: var(--text-dark); margin-bottom: 2px; }
+    .menu-btn p { font-size: 0.7rem; color: var(--gray); }
 
-        .card-scroll {
-            display: flex;
-            overflow-x: auto;
-            padding: 15px 20px;
-            gap: 15px;
-            scrollbar-width: none; /* Hide scrollbar Firefox */
-        }
-        .card-scroll::-webkit-scrollbar { display: none; /* Hide scrollbar Chrome */ }
+    .section-title {
+        padding: 0 20px;
+        font-size: 1.2rem;
+        color: var(--primary-green);
+        font-weight: 700;
+        margin-top: 10px;
+    }
 
-        .card {
-            min-width: 260px;
-            background: var(--primary-green);
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-            height: 150px;
-            flex-shrink: 0;
-            cursor: pointer;
-        }
+    .card-scroll {
+        display: flex;
+        overflow-x: auto;
+        padding: 15px 20px;
+        gap: 15px;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+    }
+    .card-scroll::-webkit-scrollbar { display: none; /* Hide scrollbar Chrome */ }
 
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.85;
-            transition: opacity 0.2s;
-        }
-        
-        .card:active img { opacity: 0.6; }
+    .card {
+        min-width: 260px;
+        background: var(--primary-green);
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        height: 150px;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
 
-        .card-text {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: white;
-        }
+    .card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.85;
+        transition: opacity 0.2s;
+    }
+    
+    .card:active img { opacity: 0.6; }
 
-        /* --- SCREEN 3: ITINERARY --- */
-        .page-header {
-            background: #e8eceb;
-            padding: 50px 20px 20px;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .header-title h2 { font-size: 1.3rem; color: var(--text-dark); }
-        .header-title p { font-size: 0.85rem; color: #666; }
+    .card-text {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        color: white;
+    }
 
-        .itinerary-card {
-            background: #ffffff;
-            margin: 15px 20px;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--primary-green);
-        }
+    /* --- SCREEN 3: ITINERARY --- */
+    .page-header {
+        background: #e8eceb;
+        padding: 50px 20px 20px;
+        border-bottom-left-radius: 25px;
+        border-bottom-right-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .header-title h2 { font-size: 1.3rem; color: var(--text-dark); }
+    .header-title p { font-size: 0.85rem; color: #666; }
 
-        .itinerary-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            color: var(--primary-green);
-            font-weight: 700;
-            font-size: 1rem;
-        }
+    .itinerary-card {
+        background: #ffffff;
+        margin: 15px 20px;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 5px solid var(--primary-green);
+    }
 
-        .itinerary-list {
-            list-style: none;
-            padding-left: 10px;
-        }
+    .itinerary-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        color: var(--primary-green);
+        font-weight: 700;
+        font-size: 1rem;
+    }
 
-        .itinerary-list li {
-            font-size: 0.9rem;
-            color: #444;
-            margin-bottom: 8px;
-            position: relative;
-            padding-left: 15px;
-        }
-        
-        .itinerary-list li::before {
-            content: "•";
-            color: var(--secondary-green);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
+    .itinerary-list {
+        list-style: none;
+        padding-left: 10px;
+    }
 
-        /* --- MAP & SHARED UI --- */
-        .back-btn {
-            position: absolute;
-            top: 40px;
-            left: 20px;
-            background: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            color: var(--text-dark);
-        }
+    .itinerary-list li {
+        font-size: 0.9rem;
+        color: #444;
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 15px;
+    }
+    
+    .itinerary-list li::before {
+        content: "•";
+        color: var(--secondary-green);
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
 
-        #map-screen {
-            background-color: #dbece6;
-            position: relative;
-        }
+    /* --- MAP & SHARED UI --- */
+    .back-btn {
+        position: absolute;
+        top: 40px;
+        left: 20px;
+        background: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        color: var(--text-dark);
+    }
 
-        .fake-map-bg {
-            width: 100%;
-            height: 100%;
-            /* Simple CSS pattern to look like a map */
-            background-image: radial-gradient(#adbdb5 2px, transparent 2px);
-            background-size: 30px 30px;
-            position: relative;
-        }
+    #map-screen {
+        background-color: #dbece6;
+        position: relative;
+    }
 
-        .map-pin {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            color: var(--primary-green);
-            font-size: 3rem;
-            transform: translate(-50%, -100%);
-            text-shadow: 0 4px 4px rgba(0,0,0,0.2);
-        }
+    .fake-map-bg {
+        width: 100%;
+        height: 100%;
+        /* Simple CSS pattern to look like a map */
+        background-image: radial-gradient(#adbdb5 2px, transparent 2px);
+        background-size: 30px 30px;
+        position: relative;
+    }
 
-        .bottom-sheet {
-            position: absolute;
-            bottom: 25px;
-            left: 15px;
-            right: 15px;
-            background: #2a3d35; /* Dark UI from screenshot */
-            border-radius: 25px;
-            padding: 25px;
-            color: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
+    .map-pin {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        color: var(--primary-green);
+        font-size: 3rem;
+        transform: translate(-50%, -100%);
+        text-shadow: 0 4px 4px rgba(0,0,0,0.2);
+    }
 
-        .sheet-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
+    .bottom-sheet {
+        position: absolute;
+        bottom: 25px;
+        left: 15px;
+        right: 15px;
+        background: #2a3d35; /* Dark UI from screenshot */
+        border-radius: 25px;
+        padding: 25px;
+        color: white;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
 
-        .action-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            padding: 12px 5px;
-            border-radius: 12px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        
-        .action-btn.green-highlight { background: #4CAF50; color: white; }
+    .sheet-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
 
-        /* --- SCREEN 5: DETAIL --- */
-        .detail-img {
-            width: 100%;
-            height: 380px;
-            object-fit: cover;
-            border-bottom-left-radius: 35px;
-            border-bottom-right-radius: 35px;
-        }
+    .action-btn {
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: white;
+        padding: 12px 5px;
+        border-radius: 12px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        cursor: pointer;
+    }
+    
+    .action-btn.green-highlight { background: #4CAF50; color: white; }
 
-        .detail-content {
-            padding: 25px;
-            background: var(--light-bg);
-        }
+    /* --- SCREEN 5: DETAIL --- */
+    .detail-img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        border-bottom-left-radius: 35px;
+        border-bottom-right-radius: 35px;
+    }
 
-        .detail-tabs {
-            display: flex;
-            gap: 25px;
-            margin: 20px 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
+    .detail-content {
+        padding: 25px;
+        background: var(--light-bg);
+    }
 
-        .tab {
-            font-weight: 600;
-            color: var(--gray);
-            cursor: pointer;
-            padding-bottom: 5px;
-            font-size: 0.95rem;
-        }
-        .tab.active { color: var(--primary-green); border-bottom: 3px solid var(--primary-green); }
+    .detail-tabs {
+        display: flex;
+        gap: 25px;
+        margin: 20px 0;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
 
-        /* --- SCREEN 6: EVENTS --- */
-        .calendar-header {
-            padding: 50px 20px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-        }
-        
-        .calendar-grid {
-            padding: 10px 25px;
-            background: white;
-            margin-bottom: 20px;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-        }
-        
-        .cal-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        
-        .cal-day { font-weight: bold; width: 30px; text-align: center; font-size: 0.9rem; color: var(--gray); }
-        .cal-date { width: 30px; height: 30px; line-height: 30px; text-align: center; color: #333; font-size: 0.95rem; }
-        .cal-date.selected { background: #111; color: white; border-radius: 50%; }
+    .tab {
+        font-weight: 600;
+        color: var(--gray);
+        cursor: pointer;
+        padding-bottom: 5px;
+        font-size: 0.95rem;
+    }
+    .tab.active { color: var(--primary-green); border-bottom: 3px solid var(--primary-green); }
 
-        .event-card {
-            margin: 0 20px;
-            background: white;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
+    /* --- SCREEN 6: EVENTS --- */
+    .calendar-header {
+        padding: 50px 20px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+    }
+    
+    .calendar-grid {
+        padding: 10px 25px;
+        background: white;
+        margin-bottom: 20px;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+    
+    .cal-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    .cal-day { font-weight: bold; width: 30px; text-align: center; font-size: 0.9rem; color: var(--gray); }
+    .cal-date { width: 30px; height: 30px; line-height: 30px; text-align: center; color: #333; font-size: 0.95rem; }
+    .cal-date.selected { background: #111; color: white; border-radius: 50%; }
 
-    </style>
+    .event-card {
+        margin: 0 20px;
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+
+</style>
 </head>
 <body>
 
     <div class="app-container">
-
         <div id="landing-screen" class="screen active">
             <div class="landing-content">
+                <h1>SILAY EXPLORER</h1>
                 <p>Discover, Experience, and Explore the Paris of Negros!</p>
                 <button class="btn-primary" onclick="showScreen('home-screen')">Explore Now!</button>
             </div>
@@ -690,5 +701,4 @@
         }
     </script>
 </body>
-
 </html>
