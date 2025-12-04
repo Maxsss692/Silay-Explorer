@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silay Explorer Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-green: #2F5245; /* Dark Green */
+            --secondary-green: #5C8C7A;
+            --light-bg: #F4F6F5;
+            --text-dark: #1A1A1A;
+            --white: #FFFFFF;
+            --gray: #888888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Mobile Container */
+        .app-container {
+            width: 100%;
+            max-width: 414px; /* Phone width */
+            height: 100vh;
+            max-height: 896px;
+            background-color: var(--light-bg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Screen Management */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            display: none; /* Hidden by default */
+            background: var(--light-bg);
+            padding-bottom: 20px;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- SCREEN 1: LANDING --- */
+        #landing-screen {
+            /* FIXED: Replaced the <img...> tag with valid CSS background-image */
+            background-image: url(landing\ screen1.jpg);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+
+        }
+
+            .landing-content h1 {
+            /* UPDATED FONT: Bebas Neue */
+            font-family: 'Bebas Neue', sans-serif;
+            color: white;
+            font-size: 3.5rem; /* Increased size slightly for Bebas */
+            letter-spacing: 2px;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .landing-content p {
+            /* UPDATED FONT: Montserrat */
+            font-family: 'Montserrat', sans-serif;
+            color: #f0f0f0;
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 16px 50px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* --- SCREEN 2: HOME --- */
+        .home-header {
+            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1518182170546-0766be6f5a56?q=80&w=1000') center/cover;
+            height: 250px;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .top-nav {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 25px;
+            padding: 12px 20px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .menu-btn {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .menu-btn:active { background-color: #f0f0f0; }
+
+        .menu-btn i {
+            font-size: 1.4rem;
+            color: var(--primary-green);
+        }
+
+        .menu-btn h4 { font-size: 0.9rem; color: var(--text-dark); margin-bottom: 2px; }
+        .menu-btn p { font-size: 0.7rem; color: var(--gray); }
+
+        .section-title {
+            padding: 0 20px;
+            font-size: 1.2rem;
+            color: var(--primary-green);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .card-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px 20px;
+            gap: 15px;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+        }
+        .card-scroll::-webkit-scrollbar { display: none; /* Hide scrollbar Chrome */ }
+
+        .card {
+            min-width: 260px;
+            background: var(--primary-green);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            height: 150px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+        
+        .card:active img { opacity: 0.6; }
+
+        .card-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+        }
+
+        /* --- SCREEN 3: ITINERARY --- */
+        .page-header {
+            background: #e8eceb;
+            padding: 50px 20px 20px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header-title h2 { font-size: 1.3rem; color: var(--text-dark); }
+        .header-title p { font-size: 0.85rem; color: #666; }
+
+        .itinerary-card {
+            background: #ffffff;
+            margin: 15px 20px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-green);
+        }
+
+        .itinerary-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .itinerary-list {
+            list-style: none;
+            padding-left: 10px;
+        }
+
+        .itinerary-list li {
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .itinerary-list li::before {
+            content: "•";
+            color: var(--secondary-green);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* --- MAP & SHARED UI --- */
+        .back-btn {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: var(--text-dark);
+        }
+
+        #map-screen {
+            background-color: #dbece6;
+            position: relative;
+        }
+
+        .fake-map-bg {
+            width: 100%;
+            height: 100%;
+            /* Simple CSS pattern to look like a map */
+            background-image: radial-gradient(#adbdb5 2px, transparent 2px);
+            background-size: 30px 30px;
+            position: relative;
+        }
+
+        .map-pin {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            color: var(--primary-green);
+            font-size: 3rem;
+            transform: translate(-50%, -100%);
+            text-shadow: 0 4px 4px rgba(0,0,0,0.2);
+        }
+
+        .bottom-sheet {
+            position: absolute;
+            bottom: 25px;
+            left: 15px;
+            right: 15px;
+            background: #2a3d35; /* Dark UI from screenshot */
+            border-radius: 25px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .sheet-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 12px 5px;
+            border-radius: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .action-btn.green-highlight { background: #4CAF50; color: white; }
+
+        /* --- SCREEN 5: DETAIL --- */
+        .detail-img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            border-bottom-left-radius: 35px;
+            border-bottom-right-radius: 35px;
+        }
+
+        .detail-content {
+            padding: 25px;
+            background: var(--light-bg);
+        }
+
+        .detail-tabs {
+            display: flex;
+            gap: 25px;
+            margin: 20px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            padding-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        .tab.active { color: var(--primary-green); border-bottom: 3px solid var(--primary-green); }
+
+        /* --- SCREEN 6: EVENTS --- */
+        .calendar-header {
+            padding: 50px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+        
+        .calendar-grid {
+            padding: 10px 25px;
+            background: white;
+            margin-bottom: 20px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        
+        .cal-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .cal-day { font-weight: bold; width: 30px; text-align: center; font-size: 0.9rem; color: var(--gray); }
+        .cal-date { width: 30px; height: 30px; line-height: 30px; text-align: center; color: #333; font-size: 0.95rem; }
+        .cal-date.selected { background: #111; color: white; border-radius: 50%; }
+
+        .event-card {
+            margin: 0 20px;
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <div id="landing-screen" class="screen active">
+            <div class="landing-content">
+                <p>Discover, Experience, and Explore the Paris of Negros!</p>
+                <button class="btn-primary" onclick="showScreen('home-screen')">Explore Now!</button>
+            </div>
+        </div>
+
+        <div id="home-screen" class="screen">
+            <div class="home-header">
+                <div class="top-nav">
+                    <i class="fas fa-bars"></i>
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700;">Welcome to Silay</h2>
+                    <p style="opacity: 0.9; font-size: 0.85rem;">The Paris of Negros</p>
+                    <div class="search-bar">
+                        <i class="fas fa-search" style="margin-right: 10px; color: #aaa;"></i> Search your trip
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-btn" onclick="showScreen('map-screen')">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <div>
+                        <h4>Interactive Map</h4>
+                        <p>GPS navigation</p>
+                    </div>
+                </div>
+                <div class="menu-btn" onclick="showScreen('events-screen')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div>
+                        <h4>Events</h4>
+                        <p>Find locations</p>
+                    </div>
+                </div>
+                <div class="menu-btn">
+                    <i class="fas fa-qrcode"></i>
+                    <div>
+                        <h4>QR Scanner</h4>
+                        <p>Instant info</p>
+                    </div>
+                </div>
+                <div class="menu-btn" onclick="showScreen('itinerary-screen')">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div>
+                        <h4>Plan Trip</h4>
+                        <p>Create itinerary</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-title">Discover Silay</h3>
+            <div class="card-scroll">
+                <div class="card" onclick="showScreen('detail-screen')"> 
+                    <img src="https://images.unsplash.com/photo-1569388330292-7a6a8411dedc?q=80&w=600" alt="Heritage">
+                    <div class="card-text">
+                        <h4>Heritage Sites</h4>
+                        <p style="font-size: 0.75rem; opacity: 0.9;">Ancestral houses...</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=600" alt="Cafe">
+                    <div class="card-text">
+                        <h4>Cafés</h4>
+                        <p style="font-size: 0.75rem; opacity: 0.9;">Classic brews...</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=600" alt="Nature">
+                    <div class="card-text">
+                        <h4>Nature</h4>
+                        <p style="font-size: 0.75rem; opacity: 0.9;">Highlands & views</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="itinerary-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('home-screen')">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            
+            <div class="page-header">
+                <div style="background: #2F5245; color: white; padding: 12px; border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; margin-right: 15px;">
+                    <i class="fas fa-suitcase"></i>
+                </div>
+                <div class="header-title" style="flex: 1;">
+                    <h2>Trip to Silay City</h2>
+                    <p>3 Days of Culture and Adventure!</p>
+                </div>
+                <i class="fas fa-share-alt" style="color: #2F5245; font-size: 1.2rem;"></i>
+            </div>
+
+            <div class="itinerary-card">
+                <div class="itinerary-header">
+                    <span>DAY 01 — Arrival</span>
+                    <span>Sat, 15 Nov</span>
+                </div>
+                <ul class="itinerary-list">
+                    <li>Arrive at Bacolod-Silay Airport</li>
+                    <li>Check in at hotel</li>
+                    <li>Visit Balay Negrense</li>
+                    <li>Lunch at El Ideal</li>
+                    <li>Explore Heritage Houses</li>
+                </ul>
+            </div>
+
+            <div class="itinerary-card">
+                <div class="itinerary-header">
+                    <span>DAY 02 — Patag</span>
+                    <span>Sun, 16 Nov</span>
+                </div>
+                <ul class="itinerary-list">
+                    <li>Ilaya Highland Resort (Patag)</li>
+                    <li>Lantawan View and Mountain Pool</li>
+                    <li>Ilaya Café</li>
+                    <li>Bonfire Night</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="map-screen" class="screen">
+            <div class="fake-map-bg">
+                <div class="back-btn" onclick="showScreen('home-screen')">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <i class="fas fa-map-marker-alt map-pin"></i>
+            </div>
+            
+            <div class="bottom-sheet">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h3 style="font-size: 1.2rem;">1898 Casa and Restaurante</h3>
+                        <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">Bed and Breakfast • Heritage</p>
+                    </div>
+                    <i class="fas fa-times" onclick="showScreen('home-screen')" style="cursor: pointer; opacity: 0.7;"></i>
+                </div>
+                
+                <div class="sheet-actions">
+                    <button class="action-btn green-highlight">
+                        <i class="fas fa-walking"></i>
+                        <span>5 min</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>Call</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-globe"></i>
+                        <span>Website</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Book</span>
+                    </button>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <img src="https://images.unsplash.com/photo-1597040663436-1e0f0c057116?q=80&w=200" style="width: 50%; height: 80px; object-fit: cover; border-radius: 12px;">
+                    <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=200" style="width: 50%; height: 80px; object-fit: cover; border-radius: 12px;">
+                </div>
+            </div>
+        </div>
+
+        <div id="detail-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('home-screen')" style="top: 40px; left: 20px;">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <img src="https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?q=80&w=1000" class="detail-img">
+            
+            <div class="detail-content">
+                <h2 style="color: var(--primary-green); font-size: 1.5rem;">Ilaya Highland Resort</h2>
+                <p style="color: var(--gray); font-size: 0.9rem; margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> Patag, Silay City</p>
+                
+                <div class="detail-tabs">
+                    <span class="tab active">Overview</span>
+                    <span class="tab">Photos</span>
+                    <span class="tab">Details</span>
+                    <span class="tab">Reviews</span>
+                </div>
+
+                <p style="font-size: 0.95rem; color: #555; line-height: 1.6;">
+                    Ilaya Highland Resort offers breathtaking mountain views, cool breezes, and relaxing pools nestled in the highlands of Patag, Silay City — a perfect getaway for nature lovers.
+                </p>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn-primary" style="flex: 2; padding: 15px; box-shadow: none;">Explore</button>
+                    <button class="btn-primary" style="flex: 1; background: white; color: var(--primary-green); border: 2px solid var(--primary-green); padding: 15px; box-shadow: none;"><i class="fas fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="events-screen" class="screen">
+            <div class="calendar-header">
+                <div class="back-btn" onclick="showScreen('home-screen')" style="position: static; box-shadow: none; border: 1px solid #eee; margin: 0;">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <h2>2025</h2>
+                <i class="fas fa-search" style="font-size: 1.2rem;"></i>
+            </div>
+            
+            <h1 style="padding: 0 25px; margin-bottom: 10px;">June</h1>
+            <div class="calendar-grid">
+                <div class="cal-row">
+                    <div class="cal-day">S</div><div class="cal-day">M</div><div class="cal-day">T</div><div class="cal-day">W</div><div class="cal-day">T</div><div class="cal-day">F</div><div class="cal-day">S</div>
+                </div>
+                <div class="cal-row">
+                    <div class="cal-date">8</div><div class="cal-date">9</div><div class="cal-date">10</div><div class="cal-date">11</div><div class="cal-date selected">12</div><div class="cal-date">13</div><div class="cal-date">14</div>
+                </div>
+                <div class="cal-row">
+                    <div class="cal-date">15</div><div class="cal-date">16</div><div class="cal-date">17</div><div class="cal-date">18</div><div class="cal-date">19</div><div class="cal-date">20</div><div class="cal-date">21</div>
+                </div>
+            </div>
+            
+            <h3 style="padding: 0 25px; margin-bottom: 15px; color: var(--primary-green);">Upcoming</h3>
+
+            <div class="event-card">
+                <img src="https://images.unsplash.com/photo-1533227297464-946a36230e71?q=80&w=1000" style="width: 100%; height: 160px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 5px;">Kansilay Festival</h3>
+                    <p style="color: #666; font-size: 0.85rem;"><i class="far fa-clock"></i> 8:00 am - 10:00 pm</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        <span style="font-size: 0.85rem; color: #888;"><i class="fas fa-map-marker-alt"></i> Silay Public Plaza</span>
+                        <button style="background: var(--primary-green); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showScreen(screenId) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+                // Give small delay before display none to allow animation to attempt, 
+                // but for this simple prototype, immediate switch is fine.
+                screen.style.display = 'none'; 
+            });
+
+            // Show target screen
+            const activeScreen = document.getElementById(screenId);
+            if (activeScreen) {
+                activeScreen.style.display = 'block';
+                // Small timeout to allow browser to register display:block before adding opacity class
+                setTimeout(() => {
+                    activeScreen.classList.add('active');
+                }, 10);
+            }
+        }
+    </script>
+</body>
+</html>
