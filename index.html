@@ -307,7 +307,7 @@
         color: var(--text-dark);
     }
 
-    /* --- SCREEN 4: INTERACTIVE MAP (FIXED FOR SATELLITE & INTERACTION) --- */
+    /* --- SCREEN 4: INTERACTIVE MAP --- */
     #map-screen {
         position: relative;
         background-color: #eee;
@@ -326,7 +326,6 @@
         width: 100%;
         height: 100%;
         border: 0;
-        /* Crucial for enabling touch/drag on the map */
         pointer-events: all;
     }
 
@@ -433,7 +432,8 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin-bottom: 20px;
     }
- /* --- QR SCANNER SCREEN --- */
+
+    /* --- QR SCANNER SCREEN CSS --- */
     #qr-screen {
         background-color: black;
         display: none;
@@ -561,7 +561,8 @@
                         <p>Find locations</p>
                     </div>
                 </div>
-                <div class="menu-btn" onclick="openQRScanner()"> <i class="fas fa-qrcode"></i>
+                <div class="menu-btn" onclick="openQRScanner()"> 
+                    <i class="fas fa-qrcode"></i>
                     <div>
                         <h4>QR Scanner</h4>
                         <p>Instant info</p>
@@ -760,19 +761,39 @@
             </div>
         </div>
 
+        <div id="qr-screen" class="screen" style="background: black;">
+            <video id="qr-video" playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;"></video>
+            
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5;">
+                
+                <div style="width: 250px; height: 250px; border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; position: relative; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);">
+                    <div style="position: absolute; top: -2px; left: -2px; width: 40px; height: 40px; border-left: 4px solid #4CAF50; border-top: 4px solid #4CAF50; border-top-left-radius: 20px;"></div>
+                    <div style="position: absolute; top: -2px; right: -2px; width: 40px; height: 40px; border-right: 4px solid #4CAF50; border-top: 4px solid #4CAF50; border-top-right-radius: 20px;"></div>
+                    <div style="position: absolute; bottom: -2px; left: -2px; width: 40px; height: 40px; border-left: 4px solid #4CAF50; border-bottom: 4px solid #4CAF50; border-bottom-left-radius: 20px;"></div>
+                    <div style="position: absolute; bottom: -2px; right: -2px; width: 40px; height: 40px; border-right: 4px solid #4CAF50; border-bottom: 4px solid #4CAF50; border-bottom-right-radius: 20px;"></div>
+                    
+                    <div class="scan-line" style="width: 100%; height: 2px; background: #4CAF50; box-shadow: 0 0 4px #4CAF50; position: absolute; animation: scanAnim 2s infinite;"></div>
+                </div>
+
+                <p style="color: white; margin-top: 20px; font-size: 0.9rem; z-index: 10;">Align QR code within frame</p>
+
+                <button onclick="closeQRScanner()" style="margin-top: 40px; background: rgba(255,255,255,0.2); border: none; padding: 10px 20px; border-radius: 30px; color: white; cursor: pointer; z-index: 10;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
     </div>
 
 <script>
-        // --- EXISTING NAVIGATION FUNCTION ---
+        // --- NAVIGATION FUNCTION ---
         function showScreen(screenId) {
-            // Hide all screens
             const screens = document.querySelectorAll('.screen');
             screens.forEach(screen => {
                 screen.classList.remove('active');
                 screen.style.display = 'none'; 
             });
 
-            // Show target screen
             const activeScreen = document.getElementById(screenId);
             if (activeScreen) {
                 activeScreen.style.display = 'block';
@@ -782,48 +803,52 @@
             }
         }
 
-        // --- NEW QR SCANNER FUNCTIONS ---
+        // --- SMART QR SCANNER ---
         let videoStream = null;
 
-            async function openQRScanner() {
+        async function openQRScanner() {
             showScreen('qr-screen');
             const video = document.getElementById('qr-video');
 
+            // SAFETY CHECK: If this is null, the HTML is missing!
+            if (!video) {
+                alert("Error: HTML for camera missing. Please check Step 1.");
+                return;
+            }
+
             try {
-                // UPDATE: "video: true" asks for ANY camera (works on laptops & phones)
+                // 1. Try to get the Back Camera (Best for phones)
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true 
+                    video: { facingMode: "environment" } 
                 });
-                
                 videoStream = stream;
                 video.srcObject = stream;
                 video.play();
             } catch (err) {
-                console.error("Error accessing camera: ", err);
-                // Check if the user blocked it manually
-                if (err.name === 'NotAllowedError') {
-                    alert("Permission denied. Please click the lock icon in the address bar and allow Camera access.");
-                } else if (err.name === 'NotFoundError') {
-                    alert("No camera found on this device.");
-                } else {
-                    alert("Camera error: " + err.message);
+                console.log("Back camera failed, trying any camera...", err);
+                
+                // 2. FALLBACK: Try ANY camera (Best for laptops)
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true 
+                    });
+                    videoStream = stream;
+                    video.srcObject = stream;
+                    video.play();
+                } catch (fallbackErr) {
+                    alert("Camera failed completely. Please allow camera permissions.");
+                    showScreen('home-screen');
                 }
-                showScreen('home-screen');
             }
         }
 
         function closeQRScanner() {
             const video = document.getElementById('qr-video');
-
-            // 1. Stop the camera stream (important for battery/privacy)
             if (videoStream) {
-                const tracks = videoStream.getTracks();
-                tracks.forEach(track => track.stop());
+                videoStream.getTracks().forEach(track => track.stop());
                 videoStream = null;
             }
-            video.srcObject = null;
-
-            // 2. Return to home screen
+            if (video) video.srcObject = null;
             showScreen('home-screen');
         }
     </script>
