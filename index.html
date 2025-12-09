@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silay Explorer Prototype</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silay Explorer Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
 <style>
 /* --- 1. LOAD THE CUSTOM FONT --- */
 @font-face {
@@ -25,6 +25,7 @@
         --gray: #888888;
         --chat-user-bg: #2F5245;
         --chat-bot-bg: #E0E0E0;
+        --red-alert: #FF4B4B;
     }
 
     * {
@@ -76,6 +77,112 @@
         from { opacity: 0; }
         to { opacity: 1; }
     }
+
+    /* --- SIDE MENU DRAWER (LEFT) --- */
+    .side-menu {
+        position: absolute;
+        top: 0;
+        left: -100%; 
+        width: 75%;
+        height: 100%;
+        background: white;
+        z-index: 2000;
+        transition: left 0.3s ease-in-out;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .side-menu.active { left: 0; }
+
+    /* --- NOTIFICATION DRAWER (RIGHT) --- */
+    .notif-drawer {
+        position: absolute;
+        top: 0;
+        right: -100%; /* Hidden on right */
+        width: 80%;
+        height: 100%;
+        background: white;
+        z-index: 2001;
+        transition: right 0.3s ease-in-out;
+        box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .notif-drawer.active { right: 0; }
+
+    /* Shared Overlay for Menus */
+    .menu-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1999;
+        display: none;
+    }
+    
+    .menu-overlay.active { display: block; }
+
+    .menu-header {
+        background: var(--primary-green);
+        padding: 40px 20px 20px 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .menu-list {
+        list-style: none;
+        padding: 20px;
+    }
+
+    .menu-list li {
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+        color: var(--text-dark);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .menu-list li:active { opacity: 0.6; }
+
+    /* Notification Items Style */
+    .notif-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .notif-item:active { background: #f9f9f9; }
+    
+    .notif-item.unread { background: #f0f7f4; }
+
+    .notif-icon-box {
+        width: 40px;
+        height: 40px;
+        background: #e0e0e0;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--primary-green);
+        flex-shrink: 0;
+    }
+
+    .notif-text h4 { font-size: 0.9rem; margin-bottom: 3px; color: var(--text-dark); }
+    .notif-text p { font-size: 0.75rem; color: #666; line-height: 1.3; }
+    .notif-time { font-size: 0.65rem; color: #999; margin-top: 5px; display: block; }
 
     /* --- SCREEN 1: LANDING --- */
     #landing-screen {
@@ -148,6 +255,33 @@
         z-index: 10;
     }
 
+    /* Red Dot Badge */
+    .bell-wrapper {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .red-dot {
+        position: absolute;
+        top: -2px;
+        right: -1px;
+        width: 10px;
+        height: 10px;
+        background-color: var(--red-alert);
+        border-radius: 50%;
+        border: 2px solid white;
+        display: none; 
+        animation: pulse 2s infinite;
+    }
+
+    .red-dot.visible { display: block; }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
     .search-bar {
         background: white;
         border-radius: 25px;
@@ -204,19 +338,20 @@
         padding: 15px 20px;
         gap: 15px;
         scrollbar-width: none;
+        padding-right: 20px; 
     }
     .card-scroll::-webkit-scrollbar { display: none; }
 
-    /* --- UPDATED CARD SIZE (224px x 130.4px) --- */
     .card {
-        min-width: 224px;
-        height: 130.4px;
+        width: 280px;      /* Fixed width */
+        height: 180px;     /* Fixed height */
         background: var(--primary-green);
         border-radius: 15px;
         overflow: hidden;
         position: relative;
-        flex-shrink: 0;
+        flex-shrink: 0;    
         cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
     .card img {
@@ -239,7 +374,47 @@
         color: white;
     }
 
-    /* --- SCREEN 3: ITINERARY --- */
+    /* --- ITINERARY SETUP SCREEN CSS --- */
+    .setup-container {
+        padding: 20px;
+    }
+
+    .pref-section {
+        margin-bottom: 30px;
+    }
+
+    .pref-title {
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .chip-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .chip {
+        padding: 10px 20px;
+        border-radius: 25px;
+        background: white;
+        border: 1px solid #ddd;
+        color: #555;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .chip.selected {
+        background: var(--primary-green);
+        color: white;
+        border-color: var(--primary-green);
+        box-shadow: 0 4px 10px rgba(47, 82, 69, 0.3);
+    }
+
+    /* --- SCREEN 3: ITINERARY RESULT --- */
     .page-header {
         background: #e8eceb;
         padding: 50px 20px 20px;
@@ -271,26 +446,35 @@
         font-size: 1rem;
     }
 
-    .itinerary-list {
+    .dynamic-list {
         list-style: none;
-        padding-left: 10px;
+        padding: 0;
     }
 
-    .itinerary-list li {
-        font-size: 0.9rem;
-        color: #444;
-        margin-bottom: 8px;
-        position: relative;
-        padding-left: 15px;
+    .dynamic-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f4f4f4;
     }
-    
-    .itinerary-list li::before {
-        content: "•";
-        color: var(--secondary-green);
-        font-weight: bold;
-        position: absolute;
-        left: 0;
+
+    .dynamic-item:last-child { border-bottom: none; }
+
+    .item-checkbox {
+        width: 18px;
+        height: 18px;
+        margin-top: 3px;
+        accent-color: var(--primary-green);
+        cursor: pointer;
     }
+
+    .item-info h4 { font-size: 0.9rem; color: #333; margin-bottom: 2px; }
+    .item-info p { font-size: 0.75rem; color: #888; }
+    .item-time { font-size: 0.75rem; color: var(--secondary-green); font-weight: 600; display: block; margin-bottom: 2px;}
+
+    /* Style for unchecked/checked items */
+    .dynamic-item.disabled .item-info { opacity: 0.5; text-decoration: line-through; }
 
     /* --- SHARED UI --- */
     .back-btn {
@@ -637,11 +821,85 @@
         align-items: center;
         cursor: pointer;
     }
+
+    /* --- ABOUT PAGE CSS --- */
+    .about-logo {
+        width: 100px;
+        height: 100px;
+        background: var(--primary-green);
+        border-radius: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 40px auto 20px;
+        color: white;
+        font-size: 3rem;
+        box-shadow: 0 10px 20px rgba(47, 82, 69, 0.2);
+    }
+
+    .about-content {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .version-tag {
+        background: #e0e0e0;
+        color: #555;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .developer-section {
+        margin-top: 40px;
+        border-top: 1px solid #eee;
+        padding-top: 30px;
+    }
 </style>
 </head>
 <body>
 
     <div class="app-container">
+    
+        <div id="menu-overlay" class="menu-overlay" onclick="closeAllMenus()"></div>
+        
+        <div id="side-menu" class="side-menu">
+            <div class="menu-header">
+                <h2 style="font-family: 'Barabara'; letter-spacing: 1px; margin: 0;">SILAY EXPLORER</h2>
+                <i class="fas fa-times" onclick="toggleMenu()" style="cursor: pointer; font-size: 1.2rem;"></i>
+            </div>
+            <ul class="menu-list">
+                <li onclick="toggleMenu(); showScreen('home-screen')"><i class="fas fa-home"></i> Home</li>
+                <li onclick="toggleMenu(); showScreen('map-screen')"><i class="fas fa-map-marked-alt"></i> Map Guide</li>
+                <li onclick="toggleMenu(); showScreen('events-screen')"><i class="fas fa-calendar-alt"></i> Events</li>
+                <li onclick="toggleMenu(); openQRScanner()"><i class="fas fa-qrcode"></i> QR Scanner</li>
+                <li onclick="toggleMenu(); checkItinerary()"><i class="fas fa-clipboard-list"></i> My Itinerary</li>
+                <li onclick="toggleMenu(); showScreen('about-screen')"><i class="fas fa-info-circle"></i> About App</li>
+            </ul>
+            <div style="margin-top: auto; padding: 20px; text-align: center; color: #aaa; font-size: 0.8rem;">
+                <p>Version 1.0 Prototype</p>
+            </div>
+        </div>
+
+        <div id="notif-drawer" class="notif-drawer">
+            <div class="menu-header">
+                <h3 style="margin: 0;">Notifications</h3>
+                <i class="fas fa-times" onclick="toggleNotifications()" style="cursor: pointer; font-size: 1.2rem;"></i>
+            </div>
+            <div style="flex: 1; overflow-y: auto;">
+                <div class="notif-item unread" onclick="toggleNotifications(); showScreen('events-screen');">
+                    <div class="notif-icon-box"><i class="fas fa-calendar-check"></i></div>
+                    <div class="notif-text">
+                        <h4>Upcoming Event: Kansilay</h4>
+                        <p>The annual festival starts in 2 days at the Public Plaza. Don't miss the parade!</p>
+                        <span class="notif-time">2 mins ago</span>
+                    </div>
+                </div>
+                </div>
+        </div>
+
         <div id="landing-screen" class="screen active">
             <div class="landing-content">
                 <h1>SILAY EXPLORER</h1>
@@ -653,8 +911,12 @@
         <div id="home-screen" class="screen">
             <div class="home-header">
                 <div class="top-nav">
-                    <i class="fas fa-bars"></i>
-                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-bars" onclick="toggleMenu()"></i>
+                    
+                    <div class="bell-wrapper" onclick="toggleNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <div id="red-dot" class="red-dot"></div>
+                    </div>
                 </div>
                 <div>
                     <h2 style="font-size: 1.5rem; font-weight: 700;">Welcome to Silay</h2>
@@ -669,7 +931,7 @@
                 <div class="menu-btn" onclick="showScreen('map-screen')">
                     <i class="fas fa-map-marked-alt"></i>
                     <div>
-                        <h4>Interactive Map</h4>
+                        <h4>Silay Map</h4>
                         <p>GPS navigation</p>
                     </div>
                 </div>
@@ -687,7 +949,7 @@
                         <p>Instant info</p>
                     </div>
                 </div>
-                <div class="menu-btn" onclick="showScreen('itinerary-screen')">
+                <div class="menu-btn" onclick="showScreen('itinerary-setup-screen')">
                     <i class="fas fa-clipboard-list"></i>
                     <div>
                         <h4>Plan Trip</h4>
@@ -698,31 +960,72 @@
 
             <h3 class="section-title">Discover Silay</h3>
             <div class="card-scroll">
-                <div class="card" onclick="showScreen('detail-screen')"> 
+                
+                <div class="card" onclick="openDetail('balay')"> 
                     <img src="heritage head.jpg" alt="Heritage">
                     <div class="card-text">
                         <h4>Heritage Sites</h4>
                         <p style="font-size: 0.75rem; opacity: 0.9;">Ancestral houses...</p>
                     </div>
                 </div>
-                <div class="card">
+
+                <div class="card" onclick="openDetail('larga')">
                     <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=600" alt="Cafe">
                     <div class="card-text">
                         <h4>Cafés</h4>
                         <p style="font-size: 0.75rem; opacity: 0.9;">Classic brews...</p>
                     </div>
                 </div>
-                <div class="card">
+
+                <div class="card" onclick="openDetail('ilaya')">
                     <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=600" alt="Nature">
                     <div class="card-text">
                         <h4>Nature</h4>
                         <p style="font-size: 0.75rem; opacity: 0.9;">Highlands & views</p>
                     </div>
                 </div>
+
             </div>
 
             <div class="chat-fab" onclick="toggleChat()">
                 <i class="fas fa-robot"></i>
+            </div>
+        </div>
+
+        <div id="itinerary-setup-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('home-screen')">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            
+            <div class="page-header" style="background: white; border: none; padding-bottom: 0; padding-top: 100px;">
+                <div class="header-title">
+                    <h2 style="font-size: 1.8rem; color: var(--primary-green);">Personalize<br>Your Trip</h2>
+                    <p>Let us help you plan your Silay experience.</p>
+                </div>
+            </div>
+
+            <div class="setup-container">
+                <div class="pref-section">
+                    <h3 class="pref-title">1. What are your interests?</h3>
+                    <div class="chip-grid">
+                        <div class="chip" onclick="togglePref(this, 'history')">Historical Sites</div>
+                        <div class="chip" onclick="togglePref(this, 'nature')">Nature & Views</div>
+                        <div class="chip" onclick="togglePref(this, 'food')">Food & Cafe</div>
+                        <div class="chip" onclick="togglePref(this, 'adventure')">Adventure</div>
+                    </div>
+                </div>
+
+                <div class="pref-section">
+                    <h3 class="pref-title">2. Duration of visit?</h3>
+                    <div class="chip-grid">
+                        <div class="chip duration-chip" onclick="selectDuration(this, 'half')">Half Day (4 hrs)</div>
+                        <div class="chip duration-chip" onclick="selectDuration(this, 'full')">Full Day (8 hrs)</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <button class="btn-primary" style="width: 100%;" onclick="generateItinerary()">Generate Itinerary</button>
+                </div>
             </div>
         </div>
 
@@ -736,37 +1039,26 @@
                     <i class="fas fa-suitcase"></i>
                 </div>
                 <div class="header-title" style="flex: 1;">
-                    <h2>Trip to Silay City</h2>
-                    <p>3 Days of Culture and Adventure!</p>
+                    <h2>Your Trip</h2>
+                    <p id="itinerary-subtitle">Calculated for you</p>
                 </div>
-                <i class="fas fa-share-alt" style="color: #2F5245; font-size: 1.2rem;"></i>
+                <i class="fas fa-redo-alt" onclick="showScreen('itinerary-setup-screen')" style="color: #2F5245; font-size: 1.2rem; cursor: pointer;"></i>
             </div>
 
             <div class="itinerary-card">
                 <div class="itinerary-header">
-                    <span>DAY 01 — Arrival</span>
-                    <span>Sat, 15 Nov</span>
+                    <span>SUGGESTED ROUTE</span>
+                    <span id="itinerary-date">Today</span>
                 </div>
-                <ul class="itinerary-list">
-                    <li>Arrive at Bacolod-Silay Airport</li>
-                    <li>Check in at hotel</li>
-                    <li>Visit Balay Negrense</li>
-                    <li>Lunch at El Ideal</li>
-                    <li>Explore Heritage Houses</li>
+                <ul class="dynamic-list" id="generated-list">
+                    <li style="text-align: center; color: #999; padding: 20px;">
+                        No itinerary yet. <br> Go to 'Plan Trip' to create one!
+                    </li>
                 </ul>
             </div>
-
-            <div class="itinerary-card">
-                <div class="itinerary-header">
-                    <span>DAY 02 — Patag</span>
-                    <span>Sun, 16 Nov</span>
-                </div>
-                <ul class="itinerary-list">
-                    <li>Ilaya Highland Resort (Patag)</li>
-                    <li>Lantawan View and Mountain Pool</li>
-                    <li>Ilaya Café</li>
-                    <li>Bonfire Night</li>
-                </ul>
+            
+            <div style="padding: 0 20px;">
+                <button class="btn-primary" style="width: 100%; font-size: 0.9rem;" onclick="showScreen('home-screen')">Save & Return Home</button>
             </div>
         </div>
 
@@ -823,11 +1115,11 @@
             <div class="back-btn" onclick="showScreen('home-screen')" style="top: 40px; left: 20px;">
                 <i class="fas fa-arrow-left"></i>
             </div>
-            <img src="https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?q=80&w=1000" class="detail-img">
+            <img id="detail-img" src="" class="detail-img">
             
             <div class="detail-content">
-                <h2 style="color: var(--primary-green); font-size: 1.5rem;">Ilaya Highland Resort</h2>
-                <p style="color: var(--gray); font-size: 0.9rem; margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> Patag, Silay City</p>
+                <h2 id="detail-title" style="color: var(--primary-green); font-size: 1.5rem;"></h2>
+                <p id="detail-loc" style="color: var(--gray); font-size: 0.9rem; margin-top: 5px;"><i class="fas fa-map-marker-alt"></i></p>
                 
                 <div class="detail-tabs">
                     <span class="tab active">Overview</span>
@@ -836,12 +1128,10 @@
                     <span class="tab">Reviews</span>
                 </div>
 
-                <p style="font-size: 0.95rem; color: #555; line-height: 1.6;">
-                    Ilaya Highland Resort offers breathtaking mountain views, cool breezes, and relaxing pools nestled in the highlands of Patag, Silay City — a perfect getaway for nature lovers.
-                </p>
+                <p id="detail-desc" style="font-size: 0.95rem; color: #555; line-height: 1.6;"></p>
 
                 <div style="display: flex; gap: 15px; margin-top: 30px;">
-                    <button class="btn-primary" style="flex: 2; padding: 15px; box-shadow: none;">Explore</button>
+                    <button class="btn-primary" onclick="showScreen('map-screen')" style="flex: 2; padding: 15px; box-shadow: none;">Explore</button>
                     <button class="btn-primary" style="flex: 1; background: white; color: var(--primary-green); border: 2px solid var(--primary-green); padding: 15px; box-shadow: none;"><i class="fas fa-bookmark"></i></button>
                 </div>
             </div>
@@ -888,21 +1178,51 @@
             <video id="qr-video" playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;"></video>
             
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5;">
-                
                 <div style="width: 250px; height: 250px; border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; position: relative; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);">
                     <div style="position: absolute; top: -2px; left: -2px; width: 40px; height: 40px; border-left: 4px solid #4CAF50; border-top: 4px solid #4CAF50; border-top-left-radius: 20px;"></div>
                     <div style="position: absolute; top: -2px; right: -2px; width: 40px; height: 40px; border-right: 4px solid #4CAF50; border-top: 4px solid #4CAF50; border-top-right-radius: 20px;"></div>
                     <div style="position: absolute; bottom: -2px; left: -2px; width: 40px; height: 40px; border-left: 4px solid #4CAF50; border-bottom: 4px solid #4CAF50; border-bottom-left-radius: 20px;"></div>
                     <div style="position: absolute; bottom: -2px; right: -2px; width: 40px; height: 40px; border-right: 4px solid #4CAF50; border-bottom: 4px solid #4CAF50; border-bottom-right-radius: 20px;"></div>
-                    
                     <div class="scan-line" style="width: 100%; height: 2px; background: #4CAF50; box-shadow: 0 0 4px #4CAF50; position: absolute; animation: scanAnim 2s infinite;"></div>
                 </div>
-
                 <p style="color: white; margin-top: 20px; font-size: 0.9rem; z-index: 10;">Align QR code within frame</p>
-
                 <button onclick="closeQRScanner()" style="margin-top: 40px; background: rgba(255,255,255,0.2); border: none; padding: 10px 20px; border-radius: 30px; color: white; cursor: pointer; z-index: 10;">
                     Cancel
                 </button>
+            </div>
+        </div>
+
+        <div id="about-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('home-screen')" style="top: 20px; left: 20px; box-shadow: none; border: 1px solid #ddd;">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            
+            <div class="about-logo">
+                <i class="fas fa-city"></i>
+            </div>
+            
+            <div class="about-content">
+                <h1 style="font-family: 'Barabara'; margin-bottom: 5px; color: var(--primary-green);">SILAY EXPLORER</h1>
+                <span class="version-tag">Version 1.1.0</span>
+                
+                <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+                    Silay Explorer is your ultimate digital guide to the "Paris of Negros." Discover heritage houses, find local cafes, and explore the rich culture of Silay City with our interactive map and events guide.
+                </p>
+                
+                <div class="developer-section">
+                    <h4 style="color: var(--text-dark); margin-bottom: 10px;">Developed By</h4>
+                    <p style="color: var(--primary-green); font-weight: 600;">College of Computer Studies</p>
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">Programmer</p>
+                    <p style="font-size: 0.8rem; color: #000; margin-top: 5px;">JOHN NIEL FERRER</p>
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">Documents</p>
+                    <p style="font-size: 0.8rem; color: #000; margin-top: 5px;">BERNIEL ABAYON</p>
+                    <p style="font-size: 0.8rem; color: #000; margin-top: 5px;">FRANCIS SAPICO</p>
+                    <p style="font-size: 0.8rem; color: #000; margin-top: 5px;">KARL DANEIL DEQUILLA</p>
+                </div>
+                
+                <div style="margin-top: 40px;">
+                    <button class="btn-primary" onclick="window.location.href='mailto:support@silayexplorer.com'">Contact Support</button>
+                </div>
             </div>
         </div>
 
@@ -914,7 +1234,7 @@
                         <i class="fas fa-robot"></i>
                     </div>
                     <div>
-                        <h3 style="font-size: 1rem; margin: 0;">Silay AI Assistant</h3>
+                        <h3 style="font-size: 1rem; margin: 0;">Larga Ta Silay AI</h3>
                         <p style="font-size: 0.7rem; margin: 0; opacity: 0.8;">Always active</p>
                     </div>
                 </div>
@@ -939,6 +1259,48 @@
     </div>
 
 <script>
+        // --- DATA FOR PLACES ---
+        const placesData = {
+            balay: {
+                title: "Balay Negrense",
+                loc: "Cinco de Noviembre St.",
+                desc: "The first museum in Negros Occidental, showcasing the lifestyle of a 19th-century sugar baron. A must-visit heritage house!",
+                img: "Negrense.jpg"
+            },
+            larga: {
+                title: "Larga Cafe",
+                loc: "J Pitong, Calle Ledesma St.",
+                desc: "A rustic cafe offering the best local coffee and delicacies amidst the scenic views of Silay's countryside.",
+                img: "Larga.jpg"
+            },
+            ilaya: {
+                title: "Ilaya Highland Resort",
+                loc: "Patag, Silay City",
+                desc: "Ilaya Highland Resort offers breathtaking mountain views, cool breezes, and relaxing pools nestled in the highlands of Patag.",
+                img: "Illaya.jpg"
+            }
+        };
+
+        // --- NEW: ATTRACTION DATABASE FOR ITINERARY ---
+        const attractionDb = [
+            { id: 1, name: "Balay Negrense", category: "history", time: "09:00 AM" },
+            { id: 2, name: "San Diego Cathedral", category: "history", time: "10:30 AM" },
+            { id: 3, name: "El Ideal Bakery", category: "food", time: "11:30 AM" },
+            { id: 4, name: "Balay Puti", category: "food", time: "12:30 PM" },
+            { id: 5, name: "Bernardino Jalandoni", category: "history", time: "02:00 PM" },
+            { id: 6, name: "Silay Public Plaza", category: "nature", time: "03:30 PM" },
+            { id: 7, name: "Patag Eco Park", category: "nature", time: "08:00 AM" },
+            { id: 8, name: "Lantawan View", category: "nature", time: "10:00 AM" },
+            { id: 9, name: "Larga Cafe", category: "adventure", time: "02:00 PM" },
+            { id: 10, name: "Punong Gary's", category: "food", time: "06:00 PM" },
+            { id: 11, name: "Mangrove Eco-Park", category: "adventure", time: "04:00 PM" }
+        ];
+
+        // User Preferences State
+        let selectedCategories = [];
+        let selectedDuration = null;
+        let generatedItinerary = [];
+
         // --- NAVIGATION FUNCTION ---
         function showScreen(screenId) {
             const screens = document.querySelectorAll('.screen');
@@ -955,6 +1317,162 @@
                 }, 10);
             }
         }
+
+        // --- CHECK ITINERARY LOGIC ---
+        function checkItinerary() {
+            // If empty, go to setup. If full, go to result.
+            if (generatedItinerary.length === 0) {
+                showScreen('itinerary-setup-screen');
+            } else {
+                showScreen('itinerary-screen');
+            }
+        }
+
+        // --- OPEN DETAIL PAGE DYNAMICALLY ---
+        function openDetail(placeKey) {
+            const data = placesData[placeKey];
+            if (data) {
+                document.getElementById('detail-title').innerText = data.title;
+                document.getElementById('detail-loc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${data.loc}`;
+                document.getElementById('detail-desc').innerText = data.desc;
+                document.getElementById('detail-img').src = data.img;
+                showScreen('detail-screen');
+            }
+        }
+
+        // --- ITINERARY GENERATOR LOGIC ---
+        
+        function togglePref(element, category) {
+            element.classList.toggle('selected');
+            if (selectedCategories.includes(category)) {
+                selectedCategories = selectedCategories.filter(c => c !== category);
+            } else {
+                selectedCategories.push(category);
+            }
+        }
+
+        function selectDuration(element, duration) {
+            // Remove active class from all duration chips
+            document.querySelectorAll('.duration-chip').forEach(chip => chip.classList.remove('selected'));
+            // Add to clicked one
+            element.classList.add('selected');
+            selectedDuration = duration;
+        }
+
+        function generateItinerary() {
+            if (selectedCategories.length === 0 || !selectedDuration) {
+                alert("Please select at least one interest and a duration.");
+                return;
+            }
+
+            // 1. Filter attractions based on selected categories
+            let filtered = attractionDb.filter(place => selectedCategories.includes(place.category));
+            
+            // 2. Logic to limit items based on duration
+            // Half day = max 3 items, Full day = max 6 items
+            const limit = selectedDuration === 'half' ? 3 : 6;
+            
+            // Randomize slightly for variety (mocking real logic)
+            filtered.sort(() => 0.5 - Math.random());
+            
+            // Slice to limit
+            generatedItinerary = filtered.slice(0, limit);
+
+            // 3. Render
+            renderItinerary();
+            showScreen('itinerary-screen');
+        }
+
+        function renderItinerary() {
+            const listContainer = document.getElementById('generated-list');
+            listContainer.innerHTML = ""; // Clear existing
+
+            if (generatedItinerary.length === 0) {
+                listContainer.innerHTML = '<li style="text-align: center; color: #999; padding: 20px;">No matching places found. Try selecting more interests!</li>';
+                return;
+            }
+
+            // Update header
+            document.getElementById('itinerary-subtitle').innerText = 
+                selectedDuration === 'half' ? "Half Day Tour" : "Full Day Adventure";
+
+            generatedItinerary.forEach((place, index) => {
+                const li = document.createElement('li');
+                li.className = 'dynamic-item';
+                
+                // Add index to handle checkbox toggles specifically
+                li.innerHTML = `
+                    <input type="checkbox" class="item-checkbox" checked onchange="toggleItemStatus(this)">
+                    <div class="item-info">
+                        <span class="item-time">${place.time}</span>
+                        <h4>${place.name}</h4>
+                        <p>${place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
+                    </div>
+                `;
+                listContainer.appendChild(li);
+            });
+        }
+
+        function toggleItemStatus(checkbox) {
+            const itemRow = checkbox.parentElement;
+            if (checkbox.checked) {
+                itemRow.classList.remove('disabled');
+            } else {
+                itemRow.classList.add('disabled');
+            }
+        }
+
+        // --- MENU TOGGLES (UPDATED) ---
+        function closeAllMenus() {
+            document.getElementById('side-menu').classList.remove('active');
+            document.getElementById('notif-drawer').classList.remove('active');
+            document.getElementById('menu-overlay').classList.remove('active');
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('side-menu');
+            const overlay = document.getElementById('menu-overlay');
+            const notif = document.getElementById('notif-drawer');
+            
+            if (notif.classList.contains('active')) {
+                notif.classList.remove('active');
+            }
+
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                menu.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+
+        function toggleNotifications() {
+            const notif = document.getElementById('notif-drawer');
+            const menu = document.getElementById('side-menu');
+            const overlay = document.getElementById('menu-overlay');
+            const redDot = document.getElementById('red-dot');
+
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+
+            if (notif.classList.contains('active')) {
+                notif.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                notif.classList.add('active');
+                overlay.classList.add('active');
+                redDot.classList.remove('visible');
+            }
+        }
+
+        window.onload = function() {
+            setTimeout(() => {
+                const redDot = document.getElementById('red-dot');
+                if (redDot) redDot.classList.add('visible');
+            }, 3000); 
+        };
 
         // --- SMART QR SCANNER ---
         let videoStream = null;
@@ -1019,15 +1537,12 @@
             const message = input.value.trim();
             if (message === "") return;
 
-            // 1. Add User Message
             addMessage(message, 'user');
             input.value = "";
 
-            // 2. Show Typing Indicator
             const typing = document.getElementById('typing-indicator');
             typing.style.display = 'block';
 
-            // 3. Simulate AI Delay (1.5 seconds)
             setTimeout(() => {
                 typing.style.display = 'none';
                 const botResponse = getBotResponse(message);
@@ -1044,28 +1559,11 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // --- SIMULATED AI BRAIN ---
         function getBotResponse(input) {
             input = input.toLowerCase();
-
-            if (input.includes('hello') || input.includes('hi')) {
-                return "Maayong aga! Welcome to Silay. How can I help you explore today?";
-            }
-            if (input.includes('food') || input.includes('eat') || input.includes('restaurant')) {
-                return "You must try El Ideal Bakery for their Guapple Pie! Or try the heritage dining at 1898 Casa and Restaurante.";
-            }
-            if (input.includes('hotel') || input.includes('stay') || input.includes('sleep')) {
-                return "I recommend staying at a heritage house like 1898 Casa or the modern Baldevia Hotel near the plaza.";
-            }
-            if (input.includes('map') || input.includes('where')) {
-                return "You can check our Interactive Map in the menu to see all heritage sites nearby!";
-            }
-            if (input.includes('event') || input.includes('festival')) {
-                return "Don't miss the Kansilay Festival in June! It celebrates the legend of Princess Kansilay.";
-            }
-            if (input.includes('heritage') || input.includes('house')) {
-                return "Silay has over 29 heritage houses! The most famous is Balay Negrense.";
-            }
+            if (input.includes('hello') || input.includes('hi')) return "Maayong aga! Welcome to Silay. How can I help you explore today?";
+            if (input.includes('food') || input.includes('eat')) return "You must try El Ideal Bakery for their Guapple Pie! Or try the heritage dining at 1898 Casa.";
+            if (input.includes('map')) return "You can check our Interactive Map in the menu to see all heritage sites nearby!";
             return "That's interesting! I'm just a prototype AI, but I suggest checking the 'Plan Trip' section for more info about Silay.";
         }
     </script>
