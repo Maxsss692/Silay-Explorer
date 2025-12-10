@@ -11,6 +11,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
 <style>
+
+    
 /* --- 1. LOAD THE CUSTOM FONT --- */
 @font-face {
     font-family: 'Barabara';
@@ -505,6 +507,74 @@
         color: white;
         border-color: var(--primary-green);
         box-shadow: 0 4px 10px rgba(47, 82, 69, 0.3);
+    }
+
+    /* --- CUSTOM ITINERARY BUILDER STYLES (NEW) --- */
+    .or-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 30px 0;
+        color: #aaa;
+        font-size: 0.8rem;
+    }
+    .or-divider::before, .or-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+    }
+    .or-divider::before { margin-right: 10px; }
+    .or-divider::after { margin-left: 10px; }
+
+    .custom-list-item {
+        background: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid #eee;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .custom-list-item.selected {
+        border-color: var(--primary-green);
+        background: #e8f5e9;
+    }
+
+    .custom-check {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        transition: 0.2s;
+    }
+
+    .custom-list-item.selected .custom-check {
+        background: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+    
+    .selection-counter {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 100;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
     }
 
     /* --- SCREEN 3: ITINERARY RESULT --- */
@@ -1241,7 +1311,10 @@
                 </div>
             </div>
 
-            <h3 class="section-title">Discover Silay</h3>
+            <h3 class="section-title">Popular Destinations</h3>
+            <p style="padding: 0 20px; font-size: 0.85rem; color: #666; margin-bottom: 15px; line-height: 1.4;">
+                Breathtaking tourist destinations carved by nature that you can only experience in Silay City.
+            </p>
             <div class="card-scroll">
                 <div class="card" onclick="openDetail('balay')"> 
                     <img src="heritage head.jpg" alt="Heritage">
@@ -1332,7 +1405,7 @@
             <div class="page-header" style="background: white; border: none; padding-bottom: 0; padding-top: 100px;">
                 <div class="header-title">
                     <h2 style="font-size: 1.8rem; color: var(--primary-green);">Personalize<br>Your Trip</h2>
-                    <p>Let us help you plan your Silay experience.</p>
+                    <p>Let AI plan for you, or design your own.</p>
                 </div>
             </div>
 
@@ -1355,9 +1428,39 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 50px;">
-                    <button class="btn-primary" style="width: 100%;" onclick="generateItinerary()">Generate Itinerary</button>
+                <button class="btn-primary" style="width: 100%;" onclick="generateItinerary()">Generate with AI</button>
+
+                <div class="or-divider">OR</div>
+
+                <button class="btn-primary" style="width: 100%; background: white; color: var(--primary-green); border: 2px solid var(--primary-green);" onclick="openCustomBuilder()">
+                    <i class="fas fa-edit"></i> Create My Own
+                </button>
+            </div>
+        </div>
+
+        <div id="custom-itinerary-select-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('itinerary-setup-screen')">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+
+            <div class="page-header" style="padding-top: 90px; padding-bottom: 20px;">
+                <div class="header-title">
+                    <h2 style="font-size: 1.5rem; color: var(--text-dark);">Select Places</h2>
+                    <p>Tap places to add to your list.</p>
                 </div>
+            </div>
+
+            <div id="custom-list-container" style="padding: 0 20px 100px 20px;">
+                </div>
+
+            <div class="selection-counter">
+                <div>
+                    <h4 style="margin: 0; color: var(--primary-green);"><span id="count-span">0</span> Selected</h4>
+                    <p style="margin: 0; font-size: 0.75rem; color: #888;">Build your route</p>
+                </div>
+                <button class="btn-primary" style="padding: 12px 30px;" onclick="finalizeCustomItinerary()">
+                    View Itinerary <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
@@ -1642,7 +1745,7 @@
 
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
-                    Hello! I'm your Silay Explorer guide. Ask me about heritage houses, food, or events! 🌴
+                    Hello! I'm Larga your Silay Explorer guide. Ask me about heritage houses, food, or events! 🌴
                 </div>
             </div>
             
@@ -1832,6 +1935,87 @@
         } else {
             itemRow.classList.add('disabled');
         }
+    }
+
+    // --- NEW: CUSTOM ITINERARY BUILDER LOGIC ---
+    let customSelections = []; // Stores IDs of selected places
+
+    function openCustomBuilder() {
+        customSelections = []; // Reset selections
+        renderCustomBuilder();
+        updateSelectionCount();
+        showScreen('custom-itinerary-select-screen');
+    }
+
+    function renderCustomBuilder() {
+        const container = document.getElementById('custom-list-container');
+        container.innerHTML = "";
+
+        // Loop through the existing global attractionDb
+        attractionDb.forEach(place => {
+            const item = document.createElement('div');
+            item.className = 'custom-list-item';
+            item.onclick = () => toggleCustomItem(item, place.id);
+            
+            // Icon based on category
+            let icon = 'fa-map-marker-alt';
+            if(place.category === 'food') icon = 'fa-utensils';
+            if(place.category === 'history') icon = 'fa-landmark';
+            if(place.category === 'nature') icon = 'fa-tree';
+
+            item.innerHTML = `
+                <div class="custom-check" id="check-${place.id}">
+                    <i class="fas fa-check" style="font-size: 0.7rem;"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 2px;">${place.name}</h4>
+                    <span style="font-size: 0.75rem; color: #888; text-transform: capitalize;">
+                        <i class="fas ${icon}" style="margin-right: 5px;"></i>${place.category}
+                    </span>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: var(--secondary-green);">
+                    ${place.time}
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function toggleCustomItem(element, id) {
+        element.classList.toggle('selected');
+        
+        if (customSelections.includes(id)) {
+            customSelections = customSelections.filter(i => i !== id);
+        } else {
+            customSelections.push(id);
+        }
+        updateSelectionCount();
+    }
+
+    function updateSelectionCount() {
+        document.getElementById('count-span').innerText = customSelections.length;
+    }
+
+    function finalizeCustomItinerary() {
+        if (customSelections.length === 0) {
+            showToast("Empty List", "Please select at least one place.", "fas fa-exclamation-circle");
+            return;
+        }
+
+        // 1. Filter the main DB to get full objects of selected IDs
+        // We ensure they are sorted by their default time in the DB
+        generatedItinerary = attractionDb.filter(place => customSelections.includes(place.id));
+        
+        // 2. Set the global duration variable just for UI display purposes
+        selectedDuration = 'custom'; 
+
+        // 3. Render and Show
+        renderItinerary(); // Reuses your existing function!
+        
+        // Update subtitle manually for custom trip
+        document.getElementById('itinerary-subtitle').innerText = "Custom Trip Plan";
+        
+        showScreen('itinerary-screen');
     }
 
     // --- MENU & UI LOGIC ---
