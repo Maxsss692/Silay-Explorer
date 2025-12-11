@@ -117,6 +117,12 @@
         margin-bottom: 20px;
         letter-spacing: 2px;
         animation: float 2s ease-in-out infinite;
+
+        text-align: center;      /* Forces text to center if it wraps */
+        width: 100%;             /* Ensures it spans the full width */
+        padding: 0 20px;         /* Adds breathing room on the sides */
+        line-height: 1.2;        /* Adjusts spacing between SILAY and EXPLORER */
+        word-wrap: break-word;   /* Ensures long words don't break layout */
     }
 
     @keyframes float {
@@ -1308,7 +1314,7 @@
     <div class="app-container">
     
         <div id="preloader">
-            <h1 class="loader-logo">SILAY EXPLORER</h1>
+            <h2 class="loader-logo">SILAY EXPLORER</h2>
             <div class="spinner"></div>
             <div class="connection-status">
                 <i class="fas fa-wifi"></i>
