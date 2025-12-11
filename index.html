@@ -71,17 +71,85 @@
         padding-bottom: 20px;
     }
 
+    /* FIX: Specific display for Landing Screen */
+    #landing-screen {
+        display: none; /* Default hidden */
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        text-align: center;
+        padding: 60px 20px;
+    }
+
     .screen.active {
-        display: block;
         animation: fadeIn 0.3s ease-in-out;
     }
+    
+    /* When landing screen is active, it must be flex, others block */
+    #landing-screen.active { display: flex; }
+    .screen:not(#landing-screen).active { display: block; }
 
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
     }
 
-    /* --- AUTHENTICATION SCREENS CSS (NEW) --- */
+    /* --- LOADING SCREEN CSS (NEW) --- */
+    #preloader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--primary-green);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        transition: opacity 0.5s ease-out;
+    }
+
+    .loader-logo {
+        font-family: 'Barabara';
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        animation: float 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .connection-status {
+        font-size: 0.85rem;
+        opacity: 0.8;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Spinner Animation */
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* --- AUTHENTICATION SCREENS CSS --- */
     .auth-container {
         padding: 40px 30px;
         height: 100%;
@@ -300,12 +368,6 @@
         background-image: url('landing screen1.jpg'); 
         background-size: cover;
         background-position: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        text-align: center;
-        padding: 60px 20px;
     }
 
     .landing-content h1 {
@@ -1245,6 +1307,15 @@
 
     <div class="app-container">
     
+        <div id="preloader">
+            <h1 class="loader-logo">SILAY EXPLORER</h1>
+            <div class="spinner"></div>
+            <div class="connection-status">
+                <i class="fas fa-wifi"></i>
+                <span id="loading-text">Connecting...</span>
+            </div>
+        </div>
+
         <div id="menu-overlay" class="menu-overlay" onclick="closeAllMenus()"></div>
 
         <div id="toast-notification" class="toast-notification">
@@ -1956,7 +2027,13 @@
 
         const activeScreen = document.getElementById(screenId);
         if (activeScreen) {
-            activeScreen.style.display = 'block';
+            // FIX: Restore flex display for landing screen, otherwise default to block
+            if (screenId === 'landing-screen') {
+                activeScreen.style.display = 'flex';
+            } else {
+                activeScreen.style.display = 'block';
+            }
+            
             setTimeout(() => {
                 activeScreen.classList.add('active');
             }, 10);
@@ -2009,7 +2086,35 @@
         }
     }
 
-    // --- AUTHENTICATION LOGIC (NEW) ---
+    // --- NEW: POST-LOGIN NOTIFICATION LOGIC ---
+    function triggerHomeNotification() {
+        // We set a small delay (e.g., 2 seconds) so the user settles on the home screen first
+        setTimeout(() => {  
+            // 1. Show the Red Dot on the bell
+            const redDot = document.getElementById('red-dot');
+            if (redDot) redDot.classList.add('visible');
+
+            // 2. Show the Toast Popup
+            showToast('Nearby Attraction!', 'You are near the Ruins. Tap to see details.', 'fas fa-camera');
+            
+            // 3. Add the notification to the Notification Drawer list dynamically
+            const notifList = document.getElementById('notif-list');
+            const newItem = document.createElement('div');
+            newItem.className = 'notif-item unread';
+            newItem.innerHTML = `
+                <div class="notif-icon-box" style="color: #FF5722;"><i class="fas fa-camera"></i></div>
+                <div class="notif-text">
+                    <h4>Nearby Attraction!</h4>
+                    <p>You are near the <b>Ruins</b>. Tap to see details.</p>
+                    <span class="notif-time">Just now</span>
+                </div>
+            `;
+            // Insert at the top of the list
+            notifList.insertBefore(newItem, notifList.firstChild);
+        }, 2000); // 2000ms = 2 seconds delay after login
+    }
+
+    // --- AUTHENTICATION LOGIC (UPDATED) ---
     
     function handleLogin() {
         const email = document.getElementById('login-email').value;
@@ -2032,7 +2137,13 @@
             btn.style.opacity = "1";
             
             showToast("Success", "Welcome back to Silay!", "fas fa-check-circle");
+            
+            // Navigate to Home
             showScreen('home-screen');
+
+            // TRIGGER THE NOTIFICATION HERE
+            triggerHomeNotification(); 
+
         }, 1000);
     }
 
@@ -2055,7 +2166,12 @@
             btn.innerText = originalText;
             btn.style.opacity = "1";
             showToast("Account Created", "Welcome, " + name + "!", "fas fa-user-plus");
+            
             showScreen('home-screen');
+
+            // TRIGGER THE NOTIFICATION HERE
+            triggerHomeNotification(); 
+
         }, 1500);
     }
 
@@ -2347,28 +2463,47 @@
         }
     }
 
-    window.onload = function() {
-        // Trigger initial fake notification after delay
-        setTimeout(() => { 
-            const redDot = document.getElementById('red-dot');
-            if (redDot) redDot.classList.add('visible');
-            showToast('Nearby Attraction!', 'You are near the Ruins. Tap to see details.', 'fas fa-camera');
-            
-            // Add to notification list dynamically
-            const notifList = document.getElementById('notif-list');
-            const newItem = document.createElement('div');
-            newItem.className = 'notif-item unread';
-            newItem.innerHTML = `
-                <div class="notif-icon-box" style="color: #FF5722;"><i class="fas fa-camera"></i></div>
-                <div class="notif-text">
-                    <h4>Nearby Attraction!</h4>
-                    <p>You are near the <b>Ruins</b>. Tap to see details.</p>
-                    <span class="notif-time">Just now</span>
-                </div>
-            `;
-            notifList.insertBefore(newItem, notifList.firstChild);
-        }, 4000); 
-    };
+    // --- NEW: LOADING SCREEN LOGIC ---
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('preloader');
+        const loadingText = document.getElementById('loading-text');
+        
+        // Minimum wait time for UX
+        const MIN_WAIT = 1500;
+        const start = Date.now();
+
+        function hideLoader() {
+            const elapsed = Date.now() - start;
+            const remaining = Math.max(0, MIN_WAIT - elapsed);
+
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    // Show Landing Screen specifically as block (or flex via CSS logic)
+                    showScreen('landing-screen');
+                }, 500);
+            }, remaining);
+        }
+
+        // Check Connection
+        if (navigator.onLine) {
+            hideLoader();
+        } else {
+            loadingText.innerHTML = "<span style='color: #ffcccc'>No Internet Connection</span>";
+            // Wait longer if offline, then show cached version
+            setTimeout(hideLoader, 3000);
+        }
+
+        // Listen for status changes
+        window.addEventListener('offline', () => {
+            showToast('You are offline', 'Using cached data.', 'fas fa-wifi-slash');
+        });
+
+        window.addEventListener('online', () => {
+            showToast('Back Online', 'Connection restored.', 'fas fa-wifi');
+        });
+    });
 
     // --- SMART QR SCANNER ---
     let videoStream = null;
@@ -3010,16 +3145,6 @@ document.onkeydown = e => {
     //Prevent showing page source by Ctrl + U
     if(e.ctrlKey && e.key == "u") {
         alert("Don't try to view page sources")
-        return false
-    }
-    //Prevent copying anything from the page
-    if(e.ctrlKey && e.key == "c") {
-        alert("Don't try to copy page element")
-        return false
-    }
-    //Prevent paste anything from other sources
-    if(e.ctrlKey && e.key == "v") {
-        alert("Don't try to paste anything to page")
         return false
     }
 }
