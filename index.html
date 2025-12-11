@@ -11,8 +11,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
 <style>
-
-    
 /* --- 1. LOAD THE CUSTOM FONT --- */
 @font-face {
     font-family: 'Barabara';
@@ -81,6 +79,75 @@
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
+    }
+
+    /* --- AUTHENTICATION SCREENS CSS (NEW) --- */
+    .auth-container {
+        padding: 40px 30px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-header h1 {
+        font-family: 'Barabara';
+        color: var(--primary-green);
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .auth-header p {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .input-group i {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+
+    .auth-input {
+        width: 100%;
+        padding: 15px 15px 15px 50px; /* Space for icon */
+        border-radius: 30px;
+        border: 1px solid #ddd;
+        background: white;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border 0.3s;
+    }
+
+    .auth-input:focus {
+        border-color: var(--primary-green);
+    }
+
+    .auth-footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .auth-link {
+        color: var(--primary-green);
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
     }
 
     /* --- SIDE MENU DRAWER (LEFT) --- */
@@ -438,8 +505,8 @@
     .card-scroll::-webkit-scrollbar { display: none; }
 
     .card {
-        width: 280px;      /* Fixed width */
-        height: 180px;     /* Fixed height */
+        width: 280px;       /* Fixed width */
+        height: 180px;      /* Fixed height */
         background: var(--primary-green);
         border-radius: 15px;
         overflow: hidden;
@@ -1205,9 +1272,10 @@
                 <li onclick="toggleMenu(); showScreen('about-screen')"><i class="fas fa-info-circle"></i> About App</li>
                 <li onclick="toggleMenu(); showScreen('support-screen')"><i class="fas fa-heart"></i> Support Us</li>
                 <li onclick="toggleMenu(); showScreen('privacy-screen')"><i class="fas fa-user-shield"></i> Privacy Policy</li>
+                <li onclick="handleLogout()" style="color: var(--red-alert); border-bottom: none;"><i class="fas fa-sign-out-alt"></i> Logout</li>
             </ul>
             <div style="margin-top: auto; padding: 20px; text-align: center; color: #aaa; font-size: 0.8rem;">
-                <p>Version 1.0 Prototype</p>
+                <p>Version 1.2.0 Prototype</p>
             </div>
         </div>
 
@@ -1248,7 +1316,74 @@
             <div class="landing-content">
                 <h1>SILAY EXPLORER</h1>
                 <p>Discover, Experience, and Explore the Paris of Negros!</p>
-                <button class="btn-primary" onclick="showScreen('home-screen')">Explore Now!</button>
+                <button class="btn-primary" onclick="showScreen('login-screen')">Explore Now!</button>
+            </div>
+        </div>
+
+        <div id="login-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('landing-screen')" style="top: 40px; left: 20px;">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h1>WELCOME BACK</h1>
+                    <p>Sign in to continue exploring Silay.</p>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="login-email" class="auth-input" placeholder="Email Address">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="login-pass" class="auth-input" placeholder="Password">
+                </div>
+
+                <div style="text-align: right; margin-bottom: 30px;">
+                    <span style="font-size: 0.8rem; color: #888; cursor: pointer;">Forgot Password?</span>
+                </div>
+
+                <button class="btn-primary" style="width: 100%; box-shadow: 0 5px 20px rgba(47, 82, 69, 0.3);" onclick="handleLogin()">Sign In</button>
+
+                <div class="auth-footer">
+                    <p>Don't have an account? <span class="auth-link" onclick="showScreen('signup-screen')">Sign Up</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="signup-screen" class="screen">
+            <div class="back-btn" onclick="showScreen('login-screen')" style="top: 40px; left: 20px;">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h1>CREATE ACCOUNT</h1>
+                    <p>Join the Silay Explorer community.</p>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="signup-name" class="auth-input" placeholder="Full Name">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="signup-email" class="auth-input" placeholder="Email Address">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="signup-pass" class="auth-input" placeholder="Password">
+                </div>
+
+                <button class="btn-primary" style="width: 100%; margin-top: 10px; box-shadow: 0 5px 20px rgba(47, 82, 69, 0.3);" onclick="handleSignup()">Sign Up</button>
+
+                <div class="auth-footer">
+                    <p>Already have an account? <span class="auth-link" onclick="showScreen('login-screen')">Sign In</span></p>
+                </div>
             </div>
         </div>
 
@@ -1872,6 +2007,71 @@
         } else {
             showToast("Details", "Detailed view not available for this map location.", "fas fa-info");
         }
+    }
+
+    // --- AUTHENTICATION LOGIC (NEW) ---
+    
+    function handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+
+        // Simple validation (Prototype only)
+        if (email.trim() === "" || pass.trim() === "") {
+            showToast("Error", "Please fill in all fields.", "fas fa-exclamation-triangle");
+            return;
+        }
+
+        // Simulate API call delay
+        const btn = event.target; // Get button
+        const originalText = btn.innerText;
+        btn.innerText = "Signing in...";
+        btn.style.opacity = "0.7";
+
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.opacity = "1";
+            
+            showToast("Success", "Welcome back to Silay!", "fas fa-check-circle");
+            showScreen('home-screen');
+        }, 1000);
+    }
+
+    function handleSignup() {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const pass = document.getElementById('signup-pass').value;
+
+        if (name.trim() === "" || email.trim() === "" || pass.trim() === "") {
+            showToast("Error", "Please complete the form.", "fas fa-exclamation-triangle");
+            return;
+        }
+
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "Creating...";
+        btn.style.opacity = "0.7";
+
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.opacity = "1";
+            showToast("Account Created", "Welcome, " + name + "!", "fas fa-user-plus");
+            showScreen('home-screen');
+        }, 1500);
+    }
+
+    function handleLogout() {
+        // Close menu first
+        toggleMenu();
+        
+        // Show confirmation or just logout
+        showToast("Logged Out", "See you again soon!", "fas fa-sign-out-alt");
+        
+        // Clear inputs (optional)
+        document.getElementById('login-email').value = "";
+        document.getElementById('login-pass').value = "";
+        
+        // Go back to login
+        showScreen('login-screen');
     }
 
     // --- ITINERARY LOGIC ---
